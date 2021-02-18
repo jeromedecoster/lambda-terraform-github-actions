@@ -88,10 +88,22 @@ setup() {
 delete() {
     # delete a user named $PROJECT_NAME
     log delete iam user $PROJECT_NAME
-    aws iam delete-user \
+
+    aws iam detach-user-policy \
         --user-name $PROJECT_NAME \
+        --policy-arn arn:aws:iam::aws:policy/PowerUserAccess \
         --profile $AWS_PROFILE \
         2>/dev/null
+
+    source "$dir/.env"
+    aws iam delete-access-key \
+        --user-name $PROJECT_NAME \
+        --access-key-id $AWS_ACCESS_KEY_ID \
+        2>/dev/null
+
+    aws iam delete-user \
+        --user-name $PROJECT_NAME \
+        --profile $AWS_PROFILE
 
     cd "$dir"
     rm --force .env
